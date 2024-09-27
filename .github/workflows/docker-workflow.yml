@@ -16,63 +16,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+  docker:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
         with:
-          node-version: 20
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Install dependencies for Node.js (Express Backend)
+      - name: Build and Push Node.js Image
         run: |
-          cd result
-          npm install
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-express ./result
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-express
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-
-      - name: Install dependencies for Python (Flask Frontend)
+      - name: Build and Push Python Image
         run: |
-          cd vote
-          pip install -r requirements.txt
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-python ./vote
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-python
 
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 3.1
-
-      - name: Build .NET Worker
+      - name: Build and Push .NET Worker Image
         run: |
-          cd worker
-          dotnet build ./src/worker/Worker.csproj
-
-#  docker:
-#    name: Build and Push Docker Images
-#    runs-on: ubuntu-latest
-#    needs: build
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#
-#      - name: Login to DockerHub
-#        uses: docker/login-action@v3
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_TOKEN }}
-#
-#      - name: Build and Push Node.js Image
-#        run: |
-#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-express ./result
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-express
-#
-#      - name: Build and Push Python Image
-#        run: |
-#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-python ./vote
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-python
-#
-#      - name: Build and Push .NET Worker Image
-#        run: |
-#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker-net ./worker
-#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker-net
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker-net ./worker
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker-net
 
