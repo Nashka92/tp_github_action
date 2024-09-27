@@ -1,0 +1,45 @@
+services:
+  db-postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    container_name: local_pgdb
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+
+  db-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    container_name: local_redis
+    volumes:
+      - ./storage/redis/data:/data
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  backend-express:
+    depends_on:
+      - db-postgres
+      - db-redis
+    container_name: local_backend
+    build: ./result
+    ports:
+      - "3000:3000"
+
+  frontend-python:
+    depends_on:
+      - backend-express
+    container_name: local_frontend
+    build: ./vote
+    ports:
+      - "5000:80"
+
+volumes:
+  local_pgdata:
+  db_redis:
+
+
+
+
