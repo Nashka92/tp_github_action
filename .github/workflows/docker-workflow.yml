@@ -42,7 +42,7 @@ jobs:
           dotnet-version: 3.1
 
       - name: Build .NET Worker
-        working-directory: src/Worker/Worker.csproj
+        working-directory: ./worker
         run: |
           dotnet restore
           dotnet build ./worker
