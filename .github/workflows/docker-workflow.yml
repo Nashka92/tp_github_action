@@ -43,9 +43,8 @@ jobs:
 
       - name: Build .NET Worker
         run: |
-          cd worker
-          dotnet restore
-          dotnet publish -c Release -o out
+          dotnet restore src/Worker/Worker.csproj
+          dotnet build src/Worker/Worker.csproj --configuration Release --no-restore
 
 #  docker:
 #    name: Build and Push Docker Images
