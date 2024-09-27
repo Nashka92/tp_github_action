@@ -1,5 +1,5 @@
 services:
-  db-postgres:
+  db:
     image: postgres
     ports:
       - "5432:5432"
@@ -9,36 +9,48 @@ services:
     volumes:
       - local_pgdata:/var/lib/postgresql/data
 
-  db-redis:
-    image: redis
+  redis:
+    image: redis:5.0-alpine3.10
     ports:
       - "6379:6379"
     container_name: local_redis
     volumes:
-      - ./storage/redis/data:/data
+      - local_redisdata:/path/to/local/dаta:/root/redis
     environment:
-      - REDIS_REPLICATION_MODE=master
+      REDIS_PASSWORD: redis
 
   backend-express:
     depends_on:
-      - db-postgres
-      - db-redis
+      - db
     container_name: local_backend
     build: ./result
     ports:
-      - "3000:3000"
+      - "4000:4000"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: resultdb
 
   frontend-python:
     depends_on:
       - backend-express
     container_name: local_frontend
+    environment:
+      REDIS_HOST: redis
     build: ./vote
     ports:
       - "5000:80"
 
+  worker:
+    build: ./worker
+    depends_on:
+      - redis
+      - db
+
 volumes:
   local_pgdata:
-  db_redis:
+  local_redisdata:
 
 
 
