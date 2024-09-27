@@ -42,10 +42,7 @@ jobs:
           dotnet-version: 3.1
 
       - name: Build .NET Worker
-        run: |
-          cd worker
-          dotnet restore
-          dotnet build
+        run: dotnet build ./worker/src/worker/Worker.csproj
 
 #  docker:
 #    name: Build and Push Docker Images
