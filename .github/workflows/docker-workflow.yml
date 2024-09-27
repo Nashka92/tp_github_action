@@ -45,7 +45,7 @@ jobs:
         working-directory: src/Worker/Worker.csproj
         run: |
           dotnet restore
-          dotnet build Worker
+          dotnet build ./worker
 
 #  docker:
 #    name: Build and Push Docker Images
