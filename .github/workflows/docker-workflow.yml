@@ -1,0 +1,80 @@
+name: Docker CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+    name: Build and Test Applications
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies for Node.js (Express Backend)
+        run: |
+          cd result
+          npm install
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+      - name: Install dependencies for Python (Flask Frontend)
+        run: |
+          cd vote
+          pip install -r requirements.txt
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+
+      - name: Build .NET Worker
+        run: |
+          cd worker
+          dotnet restore
+          dotnet publish -c Release -o out
+
+
+#  docker:
+#    name: Build and Push Docker Images
+#    runs-on: ubuntu-latest
+#    needs: build
+#
+#    steps:
+#      # Étape 1: Cloner le dépôt
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#
+#      # Étape 2: Connexion à DockerHub
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      # Étape 3: Construire et pousser l'image pour l'application Node.js (backend)
+#      - name: Build and Push Node.js Image
+#        run: |
+#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/backend-express ./result
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/backend-express
+#
+#      # Étape 4: Construire et pousser l'image pour l'application Python (frontend)
+#      - name: Build and Push Python Image
+#        run: |
+#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-python ./vote
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-python
+#
+#      # Étape 5: Construire et pousser l'image pour le worker .NET
+#      - name: Build and Push .NET Worker Image
+#        run: |
+#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker-net ./worker
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker-net
+#
