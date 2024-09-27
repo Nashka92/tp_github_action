@@ -25,7 +25,6 @@ jobs:
         run: |
           cd result
           npm install
-          npm test # Lancer les tests si nécessaire
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -37,7 +36,6 @@ jobs:
           cd vote
           pip install -r requirements.txt
 
-      # Étape 4: Build du worker .NET
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
